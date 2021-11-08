@@ -8,7 +8,7 @@ We have a server with encrypted files uploaded on it. We need to find out our fi
     
     `virtualenv venv`
     
-2. We get inside the virtual environment with `./venv/source/bin/activate` and install the cryptography package which we will need
+2. We get inside the virtual environment with `source ./venv/bin/activate` and install the cryptography package which we will need
     
     `pip install cryptography`
     
